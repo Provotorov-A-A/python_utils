@@ -215,6 +215,45 @@ class TestParser(unittest.TestCase):
 
         self.clean_tmp()
 
+    def test_copy_file(self):
+        self.init_tmp()
+
+        org_fname = 'origin.txt'
+        org_file = os.path.join(self.tmp_dir, org_fname)
+        create_file(org_file)
+        self.assertTrue(os.path.isfile(org_file))
+        valid_data_1 = 'TEST_DATA_1'
+        self.write_file(org_file, valid_data_1)
+
+        dst_dir = self.nested_dir
+        dst_fname = 'copy.txt'
+        dst_file = os.path.join(dst_dir, dst_fname)
+
+        # copy to file
+        ok = copy_file(org_file, dst_file, overwrite=False)
+        self.assertTrue(ok)
+        self.assertTrue(os.path.isfile(dst_file))
+        rd = self.read_file(dst_file)
+        self.assertEqual(valid_data_1, rd)
+
+        # copy to existing file, ov = False
+        valid_data_2 = 'TEST_DATA_2'
+        self.write_file(org_file, valid_data_2)
+        ok = copy_file(org_file, dst_file, overwrite=False)
+        self.assertTrue(ok)
+        self.assertTrue(os.path.isfile(dst_file))
+        rd = self.read_file(dst_file)
+        self.assertEqual(valid_data_1, rd)
+
+        # copy to existing file, ov = True
+        ok = copy_file(org_file, dst_file, overwrite=True)
+        self.assertTrue(ok)
+        self.assertTrue(os.path.isfile(dst_file))
+        rd = self.read_file(dst_file)
+        self.assertEqual(valid_data_2, rd)
+
+        self.clean_tmp()
+
     def test_find_file(self):
         self.init_tmp()
 
@@ -262,4 +301,3 @@ class TestParser(unittest.TestCase):
         self.assertEqual(expected_result, result)
 
         self.clean_tmp()
-        

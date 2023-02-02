@@ -122,6 +122,27 @@ def create_file(name: str, path: str = '', overwrite: bool = False):
     return True
 
 
+def copy_file(src_name: str, dst, src_path: str = '', overwrite: bool = False):
+    """Copy src file to dst file or folder.
+    """
+    fullname: str = os.path.join(src_path, src_name)
+    if not os.path.isfile(fullname):
+        return False
+
+    if os.path.isfile(dst):
+        if overwrite:
+            if not remove_file(dst):
+                return False
+        else:
+            return True
+
+    try:
+        shutil.copy(fullname, dst)
+    except OSError:
+        return False
+    return True
+
+
 def copytree(src, dst, symlinks=False, ignore=None):
     """Copy all files and directories from src to dst.
     """
