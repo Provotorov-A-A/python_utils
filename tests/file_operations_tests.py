@@ -131,7 +131,7 @@ class TestParser(unittest.TestCase):
         self.assertTrue(wr_ok)
         # no ow
         ok = create_file(fname, self.nested_dir, overwrite=False)
-        self.assertTrue(ok)
+        self.assertFalse(ok)
         self.assertTrue(os.path.isfile(f))
         rd = self.read_file(f)
         self.assertIsNotNone(rd)
@@ -240,7 +240,7 @@ class TestParser(unittest.TestCase):
         valid_data_2 = 'TEST_DATA_2'
         self.write_file(org_file, valid_data_2)
         ok = copy_file(org_file, dst_file, overwrite=False)
-        self.assertTrue(ok)
+        self.assertFalse(ok)
         self.assertTrue(os.path.isfile(dst_file))
         rd = self.read_file(dst_file)
         self.assertEqual(valid_data_1, rd)

@@ -50,7 +50,7 @@ def remove_file(name: str, path: str = ''):
             os.remove(full_name)
         except OSError:
             return False
-    return True
+    return not os.path.isfile(full_name)
 
 
 def remove_files(path: str):
@@ -81,7 +81,7 @@ def remove_dir(name: str, path: str = '', recursively: bool = False):
 
 
 def create_dir(name: str, path: str = '', recursively: bool = True, overwrite: bool = False):
-    """ Creates directory.
+    """ Creates directory. Returns True if directory is created or already exists.
     """
     fullname: str = os.path.join(path, name)
     exists = os.path.exists(fullname)
@@ -105,13 +105,16 @@ def create_dir(name: str, path: str = '', recursively: bool = True, overwrite: b
 
 
 def create_file(name: str, path: str = '', overwrite: bool = False):
-    """ Creates file and all parent directories.
+    """ Creates file and all parent directories. Returns True only if new file is successfully created.
     """
     fullname: str = os.path.join(path, name)
     parent_dir = os.path.dirname(fullname)
     exists = os.path.exists(fullname)
-    if overwrite and exists:
-        if not remove_file(fullname):
+    if exists:
+        if overwrite:
+            if not remove_file(fullname):
+                return False
+        else:
             return False
     if not create_dir(parent_dir, recursively=True, overwrite=False):
         return False
@@ -123,7 +126,7 @@ def create_file(name: str, path: str = '', overwrite: bool = False):
 
 
 def copy_file(src_name: str, dst, src_path: str = '', overwrite: bool = False):
-    """Copy src file to dst file or folder.
+    """Copy src file to dst file or folder. Returns True if file is actually copied.
     """
     fullname: str = os.path.join(src_path, src_name)
     if not os.path.isfile(fullname):
@@ -134,7 +137,7 @@ def copy_file(src_name: str, dst, src_path: str = '', overwrite: bool = False):
             if not remove_file(dst):
                 return False
         else:
-            return True
+            return False
 
     try:
         shutil.copy(fullname, dst)
@@ -143,7 +146,7 @@ def copy_file(src_name: str, dst, src_path: str = '', overwrite: bool = False):
     return True
 
 
-def copytree(src, dst, symlinks=False, ignore=None):
+def copytree(src, dst, symlinks=False):
     """Copy all files and directories from src to dst.
     """
     for item in os.listdir(src):
@@ -151,7 +154,7 @@ def copytree(src, dst, symlinks=False, ignore=None):
         d = os.path.join(dst, item)
         try:
             if os.path.isdir(s):
-                shutil.copytree(s, d, symlinks, ignore)
+                shutil.copytree(s, d, symlinks, None)
             else:
                 shutil.copy2(s, d)
         except OSError:
