@@ -1,5 +1,7 @@
 """ Common utility procedures for file manipulation.
 
+Most of the procedures returns True in case of success and False in other case. Exceptions are ignored.
+
 @author Provotorov A. merqcio11@gmail.com
 """
 
@@ -11,15 +13,12 @@ from string_operations import strcmp
 
 
 def find_file(name: str, path: str = '', ignore_case: bool = False, is_dir: bool = False, recursively: bool = True):
-    """Returns full path of first occurrence of file or folder in specified path.
+    """Returns full path of first occurrence of file or folder in specified directory (or nested directories).
     """
     _NO_RESULT = ''
 
     if not os.path.isdir(path):
         return _NO_RESULT
-
-    # def type_cond(fs_obj, isdir):
-    #     return (isdir and os.path.isdir(fs_obj)) or (not isdir and os.path.isfile(fs_obj))
 
     type_cond = lambda fs_obj, isdir: (isdir and os.path.isdir(fs_obj)) or (not isdir and os.path.isfile(fs_obj))
 
@@ -57,12 +56,11 @@ def remove_file(name: str, path: str = ''):
 def remove_files(path: str):
     """Remove all files in specified folder. Returns True if files were successfully removed. Stops on first error.
     """
-    ret = True
     if os.path.isdir(path):
         for obj_name in os.listdir(path):
             if not remove_file(obj_name, path):
                 return False
-    return ret
+    return True
 
 
 def remove_dir(name: str, path: str = '', recursively: bool = False):
@@ -70,7 +68,6 @@ def remove_dir(name: str, path: str = '', recursively: bool = False):
     """
     dir_name = os.path.dirname(name)
     full_dir = os.path.join(path, dir_name)
-    ret = True
     if os.path.isdir(full_dir):
         full_name = os.path.join(path, name)
         try:
@@ -79,8 +76,8 @@ def remove_dir(name: str, path: str = '', recursively: bool = False):
             else:
                 os.rmdir(full_name)
         except OSError:
-            ret = False
-    return ret
+            return False
+    return True
 
 
 def create_dir(name: str, path: str = '', recursively: bool = True, overwrite: bool = False):
@@ -131,8 +128,12 @@ def copytree(src, dst, symlinks=False, ignore=None):
     for item in os.listdir(src):
         s = os.path.join(src, item)
         d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, symlinks, ignore)
-        else:
-            shutil.copy2(s, d)
+        try:
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
+        except OSError:
+            return False
+    return True
 

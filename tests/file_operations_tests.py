@@ -14,6 +14,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 src_dir = os.path.join(currentdir, '..')
 sys.path.insert(0, src_dir)
 
+
 from file_operations import *
 
 
@@ -261,3 +262,4 @@ class TestParser(unittest.TestCase):
         self.assertEqual(expected_result, result)
 
         self.clean_tmp()
+        
